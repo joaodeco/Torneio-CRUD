@@ -13,7 +13,7 @@ const atualizarJogo = require('./atualizarJogo');
 app.put('/', atualizarJogo);
 
 const deletarJogo = require('./deletar');
-app.delete('/', deletarJogo);
+app.delete('/:id', deletarJogo);
 
 const esquemaJogo = new mongoose.Schema({
     nome: { type: String, required: true },
