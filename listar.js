@@ -1,6 +1,7 @@
+const Jogo = require('./esquema')
 async function listarJogos() {
     try {
-        return await listarJogos.find();
+        return await Jogo.find();
     
     } catch (erro) {
         console.error("Erro ao obter jogo:", erro);
@@ -8,11 +9,4 @@ async function listarJogos() {
     }
 }
 
-app.get("/jogos", async (req, res) => {
-    try {
-        const Jogos = await listarJogos();
-        res.status(200).json(jogos);
-    } catch (erro) {
-        res.status(500).json({ mensagem: "Erro ao obter jogos", erro: erro.mesage });
-    }
-});
+module.exports = listarJogos

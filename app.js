@@ -9,13 +9,66 @@ mongoose
     .then(() => console.log("Conectado ao MongoDB"))
     .catch((erro) => console.error("Erro ao conectar ao MongoDB:", erro))
 
-const atualizarJogo = require('./atualizarJogo');
-app.put('/', atualizarJogo);
+const listarJogos = require('./listar');
+app.get('/jogos', async (req, res) => {
+    try {
+        const jogos = await listarJogos();
+        res.status(200).json(jogos);
+    } catch (erro) {
+        res
+            .status(500)
+            .json({ mensagem: "Erro ao obter jogos", erro: erro.message });
+    }
+});
+
+const atualizarJogo = require('./atualizar');
+app.put("/jogos/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { nome, ano, genero } = req.body;
+        const jogoAtualizado = await atualizarJogo(
+            id,
+            nome,
+            ano,
+            genero
+        );
+        if (jogoAtualizado) {
+            res
+                .status(200)
+                .json({
+                    mensagem: "Jogo atualizado com sucesso",
+                    jogo: jogoAtualizado,
+                });
+        } else {
+            res.status(404).json({ mensagem: "Jogo não encontrado" });
+        }
+    } catch (erro) {
+        res
+            .status(500)
+            .json({ mensagem: "Erro ao atualizar jogo", erro: erro.message });
+    }
+});
 
 const deletarJogo = require('./deletar');
-app.delete('/:id', deletarJogo);
+app.delete("/jogos/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const jogoDeletado = await deletarJogo(id);
+        if (jogoDeletado) {
+            res
+                .status(200)
+                .json({ mensagem: "Jogo deletado com sucesso", jogo: jogoDeletado });
+        } else {
+            res.status(404).json({ mensagem: "Jogo não encontrado" });
+        }
+    } catch (erro) {
+        res
+            .status(500)
+            .json({ mensagem: "Erro ao deletar jogo", erro: erro.message });
+    }
+});
 
-const adicionar = require('./adicionar')
+const adicionarJogo = require('./adicionar')
 app.post('/jogos', async(req, res) => {
     try {
         const { nome, ano, genero} = req.body
@@ -28,15 +81,7 @@ app.post('/jogos', async(req, res) => {
         .status(500)
         .json('Erro ao adicionar jogo')
     }
-})
-
-const esquemaJogo = new mongoose.Schema({
-    nome: { type: String, required: true },
-    ano: { type: String, required: true },
-    genero: { type: String, required: true },
 });
-
-const Jogo = mongoose.model("Jogo", esquemaJogo);
 
 const port = 3000;
 app.listen(port, () => {
