@@ -15,6 +15,21 @@ app.put('/', atualizarJogo);
 const deletarJogo = require('./deletar');
 app.delete('/:id', deletarJogo);
 
+const adicionar = require('./adicionar')
+app.post('/jogos', async(req, res) => {
+    try {
+        const { nome, ano, genero} = req.body
+        const novoJogo = await adicionarJogo(nome, ano, genero)
+        res
+        .status(201)
+        .json({mensagem: 'Jogo adiconado com sucesso', jogo: novoJogo})
+    } catch {
+        res
+        .status(500)
+        .json('Erro ao adicionar jogo')
+    }
+})
+
 const esquemaJogo = new mongoose.Schema({
     nome: { type: String, required: true },
     ano: { type: String, required: true },
